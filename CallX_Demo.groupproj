@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{E1F9ADCF-5EC3-454E-8949-AA0038AEEF42}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="ConferenceLayout\ConferenceLayout.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="AddressBook\AddressBook.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="ConferenceLayout">
+        <MSBuild Projects="ConferenceLayout\ConferenceLayout.dproj"/>
+    </Target>
+    <Target Name="ConferenceLayout:Clean">
+        <MSBuild Projects="ConferenceLayout\ConferenceLayout.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ConferenceLayout:Make">
+        <MSBuild Projects="ConferenceLayout\ConferenceLayout.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="AddressBook">
+        <MSBuild Projects="AddressBook\AddressBook.dproj"/>
+    </Target>
+    <Target Name="AddressBook:Clean">
+        <MSBuild Projects="AddressBook\AddressBook.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="AddressBook:Make">
+        <MSBuild Projects="AddressBook\AddressBook.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="ConferenceLayout;AddressBook"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="ConferenceLayout:Clean;AddressBook:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="ConferenceLayout:Make;AddressBook:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
