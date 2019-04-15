@@ -17,22 +17,24 @@ type
     MainMenu: TMainMenu;
     File1: TMenuItem;
     miExit: TMenuItem;
-    ools1: TMenuItem;
+    miTools: TMenuItem;
     miConnectionSetting: TMenuItem;
     miHardwareSetting: TMenuItem;
-    CallX: TTrueConfCallX;
-    Splitter1: TSplitter;
+    Splitter: TSplitter;
     pmAddressBook: TPopupMenu;
     ActionList: TActionList;
     actCall: TAction;
     Call1: TMenuItem;
     ImageList: TImageList;
-    Panel1: TPanel;
-    lvAddressBook: TListView;
+    pnlLeft: TPanel;
     pnlButtons: TPanel;
     Button1: TButton;
     Button2: TButton;
     actHangUp: TAction;
+    grbAB: TGroupBox;
+    lvAddressBook: TListView;
+    grbCallX: TGroupBox;
+    CallX: TTrueConfCallX;
     procedure miExitClick(Sender: TObject);
     procedure miConnectionSettingClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -57,15 +59,19 @@ type
     procedure miHardwareSettingClick(Sender: TObject);
     procedure CallXLogout(ASender: TObject; const eventDetails: WideString);
   private
-    { Private declarations }
+    // server, call_id, password and others...
     FCallXSettings: TCallXSettings;
+    // TrueConf CallX has already started working
     FStarted: boolean;
     // Address book
-    FUserStatusCache: TUserCache;
+    FAddressBook: TAddressBook;
+    // current authorized user status
     FStatus: TMyStatus;
+    // current user's detail info
     FMyDetailInfo: string;
   protected
     procedure WriteLog(ALine: string);
+    // show settings form
     procedure ShowConfigurator;
     procedure UpdateAddressBook;
   public
@@ -81,26 +87,28 @@ implementation
 
 uses LogUnit;
 
-//* -1      - невалидный пользователь
-// 0       - пользователь оффлайн
-// 1       - пользователь доступен
-// 2       - пользователь занят
-// 5       - пользователь находится в групповой конференции, которую создал он сам и в нее можно попроситься
+// -1      - unknown user
+//  0       - offline
+//  1       - online (avialable)
+//  2       - busy
+//  5       - conference owner
 // TTUserStatus = (usUnknown, usOffline, usAvialable, usBusy, usConferenceOwner);
-function UserToRowText(AUserID, ADisplayName: string; AUserStatus: integer): string;
-var status: TUserStatus;
-begin
-  Result := ADisplayName;
-  status := IntToUserStatus(AUserStatus);
-  case status of
-    usUnknown:         Result := Format('[unknown]%s', [ADisplayName]);
-    usOffline:         Result := Format('[offline]%s', [ADisplayName]);
-    usAvialable:       Result := Format('[avialable]%s', [ADisplayName]);
-    usBusy:            Result := Format('[busy]%s', [ADisplayName]);
-    usConferenceOwner: Result := Format('[conference owner]%s', [ADisplayName]);
-  end;
-end;
 
+//function UserToRowText(AUserID, ADisplayName: string; AUserStatus: integer): string;
+//var status: TUserStatus;
+//begin
+//  Result := ADisplayName;
+//  status := IntToUserStatus(AUserStatus);
+//  case status of
+//    usUnknown:         Result := Format('[unknown]%s', [ADisplayName]);
+//    usOffline:         Result := Format('[offline]%s', [ADisplayName]);
+//    usAvialable:       Result := Format('[avialable]%s', [ADisplayName]);
+//    usBusy:            Result := Format('[busy]%s', [ADisplayName]);
+//    usConferenceOwner: Result := Format('[conference owner]%s', [ADisplayName]);
+//  end;
+//end;
+
+{ Get a image index that match to user status }
 function StatusToImageIndex(AStatus: integer): integer;
 begin
   Result := 0;
@@ -113,6 +121,7 @@ begin
   end;
 end;
 
+{ Call user }
 procedure TfrmAddressBook.actCallExecute(Sender: TObject);
 var sCallID: string;
 begin
@@ -123,30 +132,35 @@ begin
   CallX.call(sCallID);
 end;
 
+{ I can call when my status is csNormal only }
 procedure TfrmAddressBook.actCallUpdate(Sender: TObject);
 begin
   actCall.Enabled := (FStatus = csNormal) and (lvAddressBook.ItemIndex > -1);
 end;
 
+{ Hang up }
 procedure TfrmAddressBook.actHangUpExecute(Sender: TObject);
 begin
   CallX.hangUp;
 end;
 
+{ I can hang up when my status is csWait or csInConference }
 procedure TfrmAddressBook.actHangUpUpdate(Sender: TObject);
 begin
   actHangUp.Enabled := FStatus in [csWait, csInConference];
 end;
 
+{ Address book update event handler }
 procedure TfrmAddressBook.CallXAbookUpdate(ASender: TObject;
   const eventDetails: WideString);
 var s: string;
 begin
   s := eventDetails;
-  FUserStatusCache.Update(s);
+  FAddressBook.Update(s);
   UpdateAddressBook;
 end;
 
+{ Event handler - getting my detail info }
 procedure TfrmAddressBook.CallXDetailInfo(ASender: TObject;
   const eventDetails: WideString);
 begin
@@ -154,18 +168,24 @@ begin
   MessageDlg('DetailInfo:'#13#10 + eventDetails, mtInformation, [mbOK], 0);
 end;
 
+{ Event handler - Invite }
+{ You can call "accept()" or "reject()" }
 procedure TfrmAddressBook.CallXInviteReceived(ASender: TObject;
   const eventDetails: WideString);
 begin
+  // always accept any calls
   CallX.accept;
 end;
 
+{ Event handler - when I logged out }
 procedure TfrmAddressBook.CallXLogout(ASender: TObject;
   const eventDetails: WideString);
 begin
   FMyDetailInfo := '';
 end;
 
+{ succesfully connected to the server (See: TCallXSettings.sServer param) }
+{ Ussualy in this event handler we calls login() function }
 procedure TfrmAddressBook.CallXServerConnected(ASender: TObject;
   const eventDetails: WideString);
 begin
@@ -179,6 +199,10 @@ begin
     WriteLog('Empty login info');
 end;
 
+{ OnXAfterStart event handler }
+{ When CallX component is succesfully started }
+{ I recommend set the hardware ((camera, microphone, speakers))
+  in this event handler }
 procedure TfrmAddressBook.CallXXAfterStart(Sender: TObject);
 begin
   WriteLog('OnXAfterStart: ==============================================');
@@ -199,21 +223,36 @@ begin
   miHardwareSetting.Enabled := True;
 end;
 
+{ One of the Important handler }
+{ Handle this event to know your current status }
 procedure TfrmAddressBook.CallXXChangeState(ASender: TObject; prevState,
   newState: Integer);
 begin
   FStatus := IntToMyStatus(newState);
-  Caption := Format('%s User: %s [%s]', [TITLE, FCallXSettings.sUser, IntToMyStringState(newState)]);
+  Caption := Format('%s. Authorized user: %s [%s]', [TITLE, FCallXSettings.sUser, IntToMyStringState(newState)]);
   if (FStatus = csNormal) and (FMyDetailInfo = '') then
     CallX.getContactDetails(FCallXSettings.sUser);
 end;
 
+{ Any errors }
 procedure TfrmAddressBook.CallXXError(ASender: TObject; errorCode: Integer;
   const errorMsg: WideString);
 begin
   MessageDlg(errorMsg, mtError, [mbOK], 0);
 end;
 
+{ Login Error handling }
+{
+ 0 - Login successful, otherwise error code
+ 1 - Answer on CheckUserLoginStatus_Method, if current CID is already authorized at TransportRouter
+ 2 - Answer on CheckUserLoginStatus_Method, if current CID is not authorized at TransportRouter - can try to login
+ 3 - Incorrect password or other problems with DB
+ 4 - Client shouldn't show error to user (example: incorrect AutoLoginKey)
+ 5 - License restriction of online users reached, server cannot login you
+ 6 - User exist, but he is disabled to use this server
+ 7 - Client should retry login after timeout (value in container or default), due to server busy or other server problems
+ 8 - User cannot login using this client app (should use other type of client app)
+}
 procedure TfrmAddressBook.CallXXLoginError(ASender: TObject;
   errorCode: Integer);
 begin
@@ -225,8 +264,9 @@ begin
   FStatus := csBeforeInit;
   Caption := TITLE + ' [connecting...]';
 
+  { Get settings: server, call_id, password }
   TfrmConfigurator.LoadSettings(FCallXSettings);
-  FUserStatusCache := TUserCache.Create;
+  FAddressBook := TAddressBook.Create;
   lvAddressBook.Clear;
   with lvAddressBook.Items.Add do
   begin
@@ -237,8 +277,8 @@ end;
 
 procedure TfrmAddressBook.FormDestroy(Sender: TObject);
 begin
-  CallX.shutdown;
-  FreeAndNil(FUserStatusCache);
+  CallX.shutdown; // have to do it! or shutdown2()
+  FreeAndNil(FAddressBook);
 end;
 
 procedure TfrmAddressBook.lvAddressBookDblClick(Sender: TObject);
@@ -266,6 +306,7 @@ begin
   end;
 end;
 
+{ Show setting form}
 procedure TfrmAddressBook.ShowConfigurator;
 var FullProgPath: PAnsiChar;
 begin
@@ -279,6 +320,7 @@ begin
   end;
 end;
 
+{ Update the Address Book List }
 procedure TfrmAddressBook.UpdateAddressBook;
 var i, idx: integer;
   sSelectedUser: string;
@@ -290,11 +332,11 @@ begin
   lvAddressBook.Items.BeginUpdate;
   try
     lvAddressBook.Items.Clear;
-    for i := 0 to FUserStatusCache.Count - 1 do begin
+    for i := 0 to FAddressBook.Count - 1 do begin
       with lvAddressBook.Items.Add do begin
-        Caption := FUserStatusCache[i].DisplayName;
-        ImageIndex := StatusToImageIndex(FUserStatusCache[i].Status);
-        SubItems.Add(FUserStatusCache[i].ID)
+        Caption := FAddressBook[i].DisplayName;
+        ImageIndex := StatusToImageIndex(FAddressBook[i].Status);
+        SubItems.Add(FAddressBook[i].ID)
       end;
     end;
   finally
@@ -306,6 +348,7 @@ begin
     lvAddressBook.Selected := item;
 end;
 
+{ Write some text to the log file }
 procedure TfrmAddressBook.WriteLog(ALine: string);
 begin
   if not FCallXSettings.bWriteLog then

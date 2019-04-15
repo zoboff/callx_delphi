@@ -3,10 +3,10 @@
         <ProjectGuid>{E1F9ADCF-5EC3-454E-8949-AA0038AEEF42}</ProjectGuid>
     </PropertyGroup>
     <ItemGroup>
-        <Projects Include="ConferenceLayout\ConferenceLayout.dproj">
+        <Projects Include="AddressBook\AddressBook.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="AddressBook\AddressBook.dproj">
+        <Projects Include="CreationInRuntime\CreationInRuntime.dproj">
             <Dependencies/>
         </Projects>
     </ItemGroup>
@@ -17,15 +17,6 @@
             <Default.Personality/>
         </BorlandProject>
     </ProjectExtensions>
-    <Target Name="ConferenceLayout">
-        <MSBuild Projects="ConferenceLayout\ConferenceLayout.dproj"/>
-    </Target>
-    <Target Name="ConferenceLayout:Clean">
-        <MSBuild Projects="ConferenceLayout\ConferenceLayout.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="ConferenceLayout:Make">
-        <MSBuild Projects="ConferenceLayout\ConferenceLayout.dproj" Targets="Make"/>
-    </Target>
     <Target Name="AddressBook">
         <MSBuild Projects="AddressBook\AddressBook.dproj"/>
     </Target>
@@ -35,14 +26,23 @@
     <Target Name="AddressBook:Make">
         <MSBuild Projects="AddressBook\AddressBook.dproj" Targets="Make"/>
     </Target>
+    <Target Name="CreationInRuntime">
+        <MSBuild Projects="CreationInRuntime\CreationInRuntime.dproj"/>
+    </Target>
+    <Target Name="CreationInRuntime:Clean">
+        <MSBuild Projects="CreationInRuntime\CreationInRuntime.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="CreationInRuntime:Make">
+        <MSBuild Projects="CreationInRuntime\CreationInRuntime.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="ConferenceLayout;AddressBook"/>
+        <CallTarget Targets="AddressBook;CreationInRuntime"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="ConferenceLayout:Clean;AddressBook:Clean"/>
+        <CallTarget Targets="AddressBook:Clean;CreationInRuntime:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="ConferenceLayout:Make;AddressBook:Make"/>
+        <CallTarget Targets="AddressBook:Make;CreationInRuntime:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

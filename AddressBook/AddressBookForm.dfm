@@ -20,7 +20,7 @@ object frmAddressBook: TfrmAddressBook
   OnDestroy = FormDestroy
   PixelsPerInch = 120
   TextHeight = 16
-  object Splitter1: TSplitter
+  object Splitter: TSplitter
     Left = 310
     Top = 0
     Width = 5
@@ -28,71 +28,16 @@ object frmAddressBook: TfrmAddressBook
     ExplicitLeft = 0
     ExplicitHeight = 457
   end
-  object CallX: TTrueConfCallX
-    Left = 315
-    Top = 0
-    Width = 504
-    Height = 452
-    Align = alClient
-    TabOrder = 0
-    OnXAfterStart = CallXXAfterStart
-    OnXChangeState = CallXXChangeState
-    OnAbookUpdate = CallXAbookUpdate
-    OnDetailInfo = CallXDetailInfo
-    OnInviteReceived = CallXInviteReceived
-    OnLogout = CallXLogout
-    OnServerConnected = CallXServerConnected
-    OnXError = CallXXError
-    OnXLoginError = CallXXLoginError
-    ExplicitLeft = -1
-    ExplicitWidth = 555
-    ExplicitHeight = 457
-    ControlData = {000E0000AC2900005F250000}
-  end
-  object Panel1: TPanel
+  object pnlLeft: TPanel
     Left = 5
     Top = 0
     Width = 305
     Height = 452
     Align = alLeft
     BevelOuter = bvNone
-    Caption = 'Panel1'
     Constraints.MinHeight = 300
     Constraints.MinWidth = 300
-    TabOrder = 1
-    object lvAddressBook: TListView
-      Left = 0
-      Top = 0
-      Width = 305
-      Height = 411
-      Align = alClient
-      Columns = <
-        item
-          Caption = 'Display Name'
-          Width = 200
-        end
-        item
-          Caption = 'Call ID'
-          Width = 100
-        end>
-      HotTrack = True
-      Items.ItemData = {
-        05BE0000000500000000000000FFFFFFFFFFFFFFFF00000000FFFFFFFF000000
-        000655007300650072002000310001000000FFFFFFFFFFFFFFFF00000000FFFF
-        FFFF000000000655007300650072002000320002000000FFFFFFFFFFFFFFFF00
-        000000FFFFFFFF000000000655007300650072002000330003000000FFFFFFFF
-        FFFFFFFF00000000FFFFFFFF0000000006550073006500720020003400040000
-        00FFFFFFFFFFFFFFFF00000000FFFFFFFF000000000655007300650072002000
-        3500}
-      ReadOnly = True
-      RowSelect = True
-      PopupMenu = pmAddressBook
-      SmallImages = ImageList
-      SortType = stText
-      TabOrder = 0
-      ViewStyle = vsReport
-      OnDblClick = lvAddressBookDblClick
-    end
+    TabOrder = 0
     object pnlButtons: TPanel
       Left = 0
       Top = 411
@@ -100,7 +45,7 @@ object frmAddressBook: TfrmAddressBook
       Height = 41
       Align = alBottom
       BevelOuter = bvNone
-      TabOrder = 1
+      TabOrder = 0
       DesignSize = (
         305
         41)
@@ -122,6 +67,85 @@ object frmAddressBook: TfrmAddressBook
         TabOrder = 1
       end
     end
+    object grbAB: TGroupBox
+      Left = 0
+      Top = 0
+      Width = 305
+      Height = 411
+      Align = alClient
+      Caption = 'Address Book'
+      TabOrder = 1
+      ExplicitLeft = 120
+      ExplicitTop = 72
+      ExplicitWidth = 185
+      ExplicitHeight = 105
+      object lvAddressBook: TListView
+        Left = 2
+        Top = 18
+        Width = 301
+        Height = 391
+        Align = alClient
+        Columns = <
+          item
+            Caption = 'Display Name'
+            Width = 200
+          end
+          item
+            Caption = 'Call ID'
+            Width = 100
+          end>
+        HotTrack = True
+        Items.ItemData = {
+          05BE0000000500000000000000FFFFFFFFFFFFFFFF00000000FFFFFFFF000000
+          000655007300650072002000310001000000FFFFFFFFFFFFFFFF00000000FFFF
+          FFFF000000000655007300650072002000320002000000FFFFFFFFFFFFFFFF00
+          000000FFFFFFFF000000000655007300650072002000330003000000FFFFFFFF
+          FFFFFFFF00000000FFFFFFFF0000000006550073006500720020003400040000
+          00FFFFFFFFFFFFFFFF00000000FFFFFFFF000000000655007300650072002000
+          3500}
+        ReadOnly = True
+        RowSelect = True
+        PopupMenu = pmAddressBook
+        SmallImages = ImageList
+        SortType = stText
+        TabOrder = 0
+        ViewStyle = vsReport
+        OnDblClick = lvAddressBookDblClick
+      end
+    end
+  end
+  object grbCallX: TGroupBox
+    Left = 315
+    Top = 0
+    Width = 504
+    Height = 452
+    Align = alClient
+    Caption = 'TrueConf SDK for Windows Control aka CallX'
+    TabOrder = 1
+    ExplicitLeft = 480
+    ExplicitTop = 168
+    ExplicitWidth = 185
+    ExplicitHeight = 105
+    object CallX: TTrueConfCallX
+      Left = 2
+      Top = 18
+      Width = 500
+      Height = 432
+      Align = alClient
+      TabOrder = 0
+      OnXAfterStart = CallXXAfterStart
+      OnXChangeState = CallXXChangeState
+      OnAbookUpdate = CallXAbookUpdate
+      OnDetailInfo = CallXDetailInfo
+      OnInviteReceived = CallXInviteReceived
+      OnLogout = CallXLogout
+      OnServerConnected = CallXServerConnected
+      OnXError = CallXXError
+      OnXLoginError = CallXXLoginError
+      ExplicitLeft = 1
+      ExplicitTop = 17
+      ControlData = {000E0000AC2900005F250000}
+    end
   end
   object MainMenu: TMainMenu
     Left = 40
@@ -134,7 +158,7 @@ object frmAddressBook: TfrmAddressBook
         OnClick = miExitClick
       end
     end
-    object ools1: TMenuItem
+    object miTools: TMenuItem
       Caption = 'Tools'
       object miConnectionSetting: TMenuItem
         Caption = 'Connection'

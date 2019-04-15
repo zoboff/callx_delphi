@@ -19,7 +19,7 @@ type
     procedure CopyFrom(AData: TUserData);
   end;
 
-  TUserCache = class(TObjectList)
+  TAddressBook = class(TObjectList)
   private
     function GetUserItem(Index: Integer): TUserData;
     procedure ReplaceOrAdd(AData: TUserData);
@@ -36,7 +36,7 @@ type
 
 implementation
 
-{ TUserCache }
+{ TAddressBook }
 
 function CompareUsers(Item1, Item2: Pointer): Integer;
 begin
@@ -45,12 +45,12 @@ begin
     Result := CompareText(TUserData(Item1).ID, TUserData(Item2).ID);
 end;
 
-function TUserCache.GetUserItem(Index: Integer): TUserData;
+function TAddressBook.GetUserItem(Index: Integer): TUserData;
 begin
   Result := TUserData(inherited Items[Index]);
 end;
 
-procedure TUserCache.ReplaceOrAdd(AData: TUserData);
+procedure TAddressBook.ReplaceOrAdd(AData: TUserData);
 var
   exUserData, newUserData: TUserData;
 begin
@@ -65,12 +65,12 @@ begin
   end;
 end;
 
-procedure TUserCache.Clear;
+procedure TAddressBook.Clear;
 begin
   inherited;
 end;
 
-function TUserCache.GetUserStatusById(userId: string): Integer;
+function TAddressBook.GetUserStatusById(userId: string): Integer;
 var
   udata: TUserData;
 begin
@@ -80,12 +80,12 @@ begin
     Result := udata.Status;
 end;
 
-function TUserCache.IsOnline(userId: string): boolean;
+function TAddressBook.IsOnline(userId: string): boolean;
 begin
   Result := GetUserStatusById(userId) = Ord(usOnline);
 end;
 
-function TUserCache.GetUserCountByStatus(AUserStatus: TUserStatus): Integer;
+function TAddressBook.GetUserCountByStatus(AUserStatus: TUserStatus): Integer;
 var i: integer;
 begin
   Result := 0;
@@ -94,7 +94,7 @@ begin
       Result := Result + 1;
 end;
 
-function TUserCache.GetUserDataById(userId: string): TUserData;
+function TAddressBook.GetUserDataById(userId: string): TUserData;
 var
   i: Integer;
 begin
@@ -106,7 +106,7 @@ begin
     end;
 end;
 
-function TUserCache.Update(jsonStr: string): Boolean;
+function TAddressBook.Update(jsonStr: string): Boolean;
 var
   JSON, evVal, abVal, userVal: TJSONValue;
   i: Integer;
