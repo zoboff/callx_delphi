@@ -21,11 +21,9 @@ object frmChangeVideoMatrix: TfrmChangeVideoMatrix
     Top = 0
     Width = 734
     Height = 427
-    ActivePage = TabSheet1
+    ActivePage = TabSheet2
     Align = alClient
     TabOrder = 0
-    ExplicitWidth = 699
-    ExplicitHeight = 406
     object TabSheet1: TTabSheet
       Caption = 'TrueConf SDK for Windows aka CallX'
       ExplicitWidth = 691
@@ -136,11 +134,11 @@ object frmChangeVideoMatrix: TfrmChangeVideoMatrix
       end
     end
     object TabSheet2: TTabSheet
-      Caption = 'Matrix'
+      Caption = 'Log'
       ImageIndex = 1
       ExplicitWidth = 691
       ExplicitHeight = 375
-      object memoMatrix: TMemo
+      object memoLog: TMemo
         Left = 0
         Top = 0
         Width = 726
@@ -148,7 +146,7 @@ object frmChangeVideoMatrix: TfrmChangeVideoMatrix
         Align = alClient
         Font.Charset = RUSSIAN_CHARSET
         Font.Color = clNavy
-        Font.Height = -17
+        Font.Height = -13
         Font.Name = 'Courier New'
         Font.Style = []
         ParentFont = False
@@ -199,9 +197,5 @@ object frmChangeVideoMatrix: TfrmChangeVideoMatrix
       OnExecute = actShakeUpExecute
       OnUpdate = actShakeUpUpdate
     end
-  end
-  object ImageList1: TImageList
-    Left = 236
-    Top = 283
   end
 end

@@ -27,12 +27,11 @@ type
     ActionList: TActionList;
     actCall: TAction;
     actHangUp: TAction;
-    memoMatrix: TMemo;
+    memoLog: TMemo;
     Splitter1: TSplitter;
     Panel1: TPanel;
     lbParticipants: TListBox;
     Panel2: TPanel;
-    ImageList1: TImageList;
     Button1: TButton;
     actShakeUp: TAction;
     rgMatrixType: TRadioGroup;
@@ -161,16 +160,41 @@ end;
 // { "matrixType": 1,
 //   "participants": [ "brasilia@conference.oversee.com.br", "amynthas@conference.oversee.com.br" ] }
 procedure TfrmChangeVideoMatrix.actShakeUpExecute(Sender: TObject);
+
+  procedure _ShakeUpStrings(AStrings: TStrings);
+  var ii, iRandomIdx: integer;
+    s: string;
+  begin
+    Randomize;
+    if lbParticipants.Items.Count < 2 then
+    begin
+
+    end
+    else if lbParticipants.Items.Count < 4 then
+    begin
+      s := lbParticipants.Items[0];
+      lbParticipants.Items.Delete(0);
+      lbParticipants.Items.Add(s)
+    end
+    else for ii := 0 to AStrings.Count - 1 do
+    begin
+      iRandomIdx := Random(AStrings.Count - 1);
+      if iRandomIdx <> ii then
+      begin
+        s := lbParticipants.Items[0];
+        lbParticipants.Items.Delete(0);
+        lbParticipants.Items.Insert(iRandomIdx, s);
+      end;
+    end;
+  end;
+
 var sParticipants, sJSONResult, sUser: string;
   i: integer;
 begin
   sParticipants := '';
-  if lbParticipants.Items.Count > 1 then
-  begin
-    sUser := lbParticipants.Items[0];
-    lbParticipants.Items.Delete(0);
-    lbParticipants.Items.Add(sUser)
-  end;
+
+  { Shake up }
+  _ShakeUpStrings(lbParticipants.Items);
 
   for i := 0 to lbParticipants.Items.Count - 1 do
   begin
@@ -179,8 +203,10 @@ begin
 
     sParticipants := sParticipants + '"' + lbParticipants.Items[i] + '"';
   end;
-  sJSONResult := Format('{"matrixType": %d, "participants": [%s]}', [rgMatrixType.ItemIndex, sParticipants]);
 
+  // Prepare a JSON string
+  sJSONResult := Format('{"matrixType": %d, "participants": [%s]}', [rgMatrixType.ItemIndex, sParticipants]);
+  // Ñhange video layout
   CallX.changeVideoMatrix(sJSONResult);
 end;
 
@@ -193,8 +219,8 @@ end;
 procedure TfrmChangeVideoMatrix.CallXChangeVideoMatrixReport(ASender: TObject;
   const eventDetails: WideString);
 begin
-  memoMatrix.Lines.Insert(0, '=== OnChangeVideoMatrixReport =====================');
-  memoMatrix.Lines.Insert(0, eventDetails);
+  memoLog.Lines.Insert(0, '=== OnChangeVideoMatrixReport =====================');
+  memoLog.Lines.Insert(0, eventDetails);
 end;
 
 procedure TfrmChangeVideoMatrix.CallXInviteReceived(ASender: TObject;
@@ -219,10 +245,10 @@ end;
 procedure TfrmChangeVideoMatrix.CallXUpdateParticipantList(ASender: TObject;
   const eventDetails: WideString);
 begin
-  memoMatrix.Lines.Insert(0, '=== OnUpdateParticipantList =======================');
-  memoMatrix.Lines.Insert(0, eventDetails);
-  memoMatrix.Lines.Insert(0, '=== getParticipantsList() =======================');
-  memoMatrix.Lines.Insert(0, CallX.getParticipantsList());
+  memoLog.Lines.Insert(0, '=== OnUpdateParticipantList =======================');
+  memoLog.Lines.Insert(0, eventDetails);
+  memoLog.Lines.Insert(0, '=== getParticipantsList() =======================');
+  memoLog.Lines.Insert(0, CallX.getParticipantsList());
   lbParticipants.Items.Text := JSON_ParticipantsListToText(CallX.getParticipantsList());
 end;
 
